@@ -167,8 +167,13 @@ define([
             }
             window.bsssdcp = true;
             this._ResetDesc(this.options.jsonModuleConfig.desc);
-            this._UpdateActiveTab();
-
+            // this._UpdateActiveTab();
+            this.options.parentProductBasePrice = $(
+                'div[data-product-id="' +
+                this.options.spConfig.productId +
+                '"][data-role="priceBox"] ' +
+                '.base-price-text'
+            ).html();
         },
 
         /**
@@ -581,6 +586,59 @@ define([
          */
         _reloadPrice: function () {
             $(this.options.priceHolderSelector).trigger('updatePrice', this._getPrices());
+            this._reloadBasePriceText();
+        },
+
+        _reloadBasePriceText: function () {
+            if (this.options.spConfig.isEnabledBasePrice == false) {
+                return;
+            }
+
+            var basePriceTexts = {};
+
+            var elements = _.toArray(this.options.settings);
+
+            var hasBasePriceText = false;
+
+            _.each(
+                elements,
+                function (element) {
+                    var selected = element.options[element.selectedIndex];
+
+                    var config = selected && selected.config;
+
+                    var basePriceText;
+
+                    if (config && this.options.spConfig.basePriceTexts && config.allowedProducts.length === 1 && !hasBasePriceText) {
+                        basePriceText = this.options.spConfig.basePriceTexts[_.first(config.allowedProducts)];
+                        hasBasePriceText = true;
+                    }
+
+                    var priceElement = $(
+                        'div[data-product-id="' + this.options.spConfig.productId + '"][data-role="priceBox"]'
+                    );
+
+                    if(priceElement && priceElement.length > 0) {
+                        if (basePriceText && basePriceText !== undefined) {
+                            $(priceElement).parent().find('.base-price-text').html(basePriceText);
+                        } else {
+                            $(priceElement)
+                                .parent()
+                                .find('.base-price-text')
+                                .html(this.options.parentProductBasePrice);
+                        }
+                    } else {
+                        var finalPrice = $('.price-box.price-final_price');
+                        if (basePriceText && basePriceText !== undefined) {
+                            finalPrice.parent().find('.base-price-text').html(basePriceText);
+                        } else {
+                            finalPrice.parent().find('.base-price-text').html(this.options.parentProductBasePrice);
+                        }
+                    }
+
+                },
+                this
+            );
         },
 
         /**
@@ -881,18 +939,22 @@ define([
 
             $widget._UpdateName(data['name'], moduleConfig['name']);
 
+            if (data.additional_info.delivery_time) {
+                $widget._UpdateDeliveryDate(data.additional_info.delivery_time);
+            }
+
             $widget._UpdateDesc(
                 data['desc'],
                 data['sdesc'],
                 moduleConfig['desc']
             );
 
-            $widget._UpdateAdditionalInfo(
-                data['additional_info'],
-                moduleConfig['additional_info']
-            );
+            // $widget._UpdateAdditionalInfo(
+            //     data['additional_info'],
+            //     moduleConfig['additional_info']
+            // );
 
-            $widget._UpdateActiveTab();
+            // $widget._UpdateActiveTab();
 
             $widget._UpdateMetaData(
                 data['meta_data'],
@@ -1010,6 +1072,9 @@ define([
                 $(this.options.sdcp_classes.sku).html($sku);
             }
         },
+        _UpdateDeliveryDate: function (delivery) {
+            $('.delivery_time').find('.value').html(delivery.value);
+        },
         _UpdateName: function ($name, $config) {
             if ($config > 0) {
                 $(this.options.sdcp_classes.name).html($name);
@@ -1017,7 +1082,7 @@ define([
         },
         _UpdateDesc: function ($desc, $sdesc, $config) {
             if ($config > 0) {
-                this._UpdateFullDesc($desc);
+                // this._UpdateFullDesc($desc);
                 this._UpdateShortDesc($sdesc);
             }
         },
@@ -1331,7 +1396,7 @@ define([
                         $('head meta[name="keywords"]').attr('content', $metaData['meta_keyword']);
                     } else {
                         $('head meta[name="description"]').after(
-                            '<meta name="keywords" content="' + $metaData['meta_keyword'] + '" />'
+                            '<meta name="keywords" content="' + $metaData['meta_keyword'] + '">'
                         );
                     }
                 } else {
@@ -1340,7 +1405,7 @@ define([
                             $('head meta[name="keywords"]').attr('content', $parentMetaData['meta_keyword']);
                         } else {
                             $('head meta[name="description"]').after(
-                                '<meta name="keywords" content="' + $parentMetaData['meta_keyword'] + '" />'
+                                '<meta name="keywords" content="' + $parentMetaData['meta_keyword'] + '">'
                             );
                         }
                     } else {
@@ -1349,8 +1414,26 @@ define([
                 }
                 if ($metaData['meta_title'] != null) {
                     document.title = $metaData['meta_title'];
+                    if ($('head meta[name="title"]').length > 0) {
+                        $('head meta[name="title"]').attr('content', $metaData['meta_title']);
+                    } else {
+                        $('head meta[name="title"]').after(
+                            '<meta name="title" content="' + $metaData['title'] + '" />'
+                        );
+                    }
                 } else {
                     document.title = $parentMetaData['meta_title'];
+                    if ($parentMetaData['title' != null]) {
+                        if ($('head meta[name="title"]').length > 0) {
+                            $('head meta[name="title"]').attr('content', $parentMetaData['meta_title']);
+                        } else {
+                            $('head meta[name="title"]').after(
+                                '<meta name="title" content="' + $parentMetaData['title'] + '" />'
+                            );
+                        }
+                    } else {
+                        $('head meta[name="title"]').remove();
+                    }
                 }
             }
         },
@@ -1513,11 +1596,11 @@ define([
             this._ResetTierPrice(moduleConfig['tier_price']);
             this._ResetUrl(moduleConfig['url']);
             this._ResetIncrement(moduleConfig['increment']);
-            this._UpdateAdditionalInfo(
-                this.options.jsonChildProduct['additional_info'],
-                moduleConfig['additional_info']
-            );
-            this._UpdateActiveTab();
+            // this._UpdateAdditionalInfo(
+            //     this.options.jsonChildProduct['additional_info'],
+            //     moduleConfig['additional_info']
+            // );
+            // this._UpdateActiveTab();
             this._ResetMetaData(moduleConfig['meta_data']);
             if (this.mediaInit) {
                 this._ResetGallery(moduleConfig['images'], moduleConfig['video']);
@@ -1536,14 +1619,14 @@ define([
         },
         _ResetDesc: function ($config) {
             if ($config > 0) {
-                if (this.options.jsonChildProduct['desc']) {
-                    $(this.options.sdcp_classes.fullDesc.label).removeClass(this.options.sdcp_classes.hiddenTab);
-                    $(this.options.sdcp_classes.fullDesc.blockContent).removeClass(this.options.sdcp_classes.hiddenTab);
-                    $(this.options.sdcp_classes.fullDesc.content).html(this.options.jsonChildProduct['desc']);
-                } else {
-                    $(this.options.sdcp_classes.fullDesc.label).addClass(this.options.sdcp_classes.hiddenTab);
-                    $(this.options.sdcp_classes.fullDesc.blockContent).addClass(this.options.sdcp_classes.hiddenTab);
-                }
+                // if (this.options.jsonChildProduct['desc']) {
+                //     $(this.options.sdcp_classes.fullDesc.label).removeClass(this.options.sdcp_classes.hiddenTab);
+                //     $(this.options.sdcp_classes.fullDesc.blockContent).removeClass(this.options.sdcp_classes.hiddenTab);
+                //     $(this.options.sdcp_classes.fullDesc.content).html(this.options.jsonChildProduct['desc']);
+                // } else {
+                //     $(this.options.sdcp_classes.fullDesc.label).addClass(this.options.sdcp_classes.hiddenTab);
+                //     $(this.options.sdcp_classes.fullDesc.blockContent).addClass(this.options.sdcp_classes.hiddenTab);
+                // }
                 $(this.options.sdcp_classes.shortDesc).find('.value').html(this.options.jsonChildProduct['sdesc']);
             }
         },
@@ -1589,7 +1672,7 @@ define([
                 images = this._setImageIndex(images);
             }
             gallery.updateData(images);
-            this._ResetVideo($configVideo, $configImage);
+            // this._ResetVideo($configVideo, $configImage);
         },
         _ResetVideo: function ($configVideo, $configImage) {
             if ($configImage === IMAGE_CONFIG_DISABLED) {
