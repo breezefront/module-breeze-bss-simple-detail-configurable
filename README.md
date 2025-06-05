@@ -6,7 +6,7 @@ Integration done for the module version 1.5.3
 
 ```bash
 composer require swissup/module-breeze-bss-simple-detail-configurable
-bin/magento setup:upgrade --safe-mode=1
+bin/magento module:enable Swissup_BreezeBssSimpleDetailConfigurable
 ```
 
 ## Required patches
