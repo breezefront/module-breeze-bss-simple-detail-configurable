@@ -1814,7 +1814,7 @@ define([
             if (undefined !== productId) {
                 $('div.data.item.title').each(function (idx, elem) {
                     var triggerIds = $(elem).attr('data-trigger');
-                    if (undefined !== triggerIds) {
+                    if (undefined !== triggerIds && triggerIds.match(/^[\d,]+$/)) {
                         if (triggerIds.split(",").indexOf(productId) !== -1) {
                             if (!$(elem).is(':visible')) {
                                 $(elem).removeClass('bss-tab-hidden').show();

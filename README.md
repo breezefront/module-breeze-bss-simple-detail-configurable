@@ -32,7 +32,7 @@ Bss_Simpledetailconfigurable/js/configurable_control.js:
                  $('.data.item.title:not(.' +this.options.sdcp_classes.hiddenTab+ ')').first().addClass('active');
                  $('.data.item.content:not(.' +this.options.sdcp_classes.hiddenTab+ ')').first().css('display', 'block');
 
-@@ -903,7 +903,7 @@
+@@ -906,7 +906,7 @@
          _UpdateUrl: function ($parentUrl, $customUrl, $config, $suffix) {
              if ($config > 0 && $('.checkout-cart-configure').length == 0) {
                  $customUrl = $customUrl.replace(/[`!@#$%^&*()|\;:'",.<>\{\}\[\]\\\/]/g,'');
@@ -41,7 +41,7 @@ Bss_Simpledetailconfigurable/js/configurable_control.js:
                  while ($customUrl.indexOf(' ') >= 0) {
                      $customUrl = $customUrl.replace(" ", "~");
                  }
-@@ -929,7 +929,7 @@
+@@ -932,7 +932,7 @@
          _UpdateSelected: function ($options, $widget) {
              var config = $options.jsonModuleConfig,
                  data = $options.jsonChildProduct,
@@ -50,7 +50,7 @@ Bss_Simpledetailconfigurable/js/configurable_control.js:
                  selectingAttr = [],
                  attr,
                  selectedAttr = customUrl.split('+'),
-@@ -982,7 +982,7 @@
+@@ -985,7 +985,7 @@
                              + '"] .swatch-attribute-options').children().is('div')) {
                              $('.swatch-attribute[' + swSelector + 'attribute-code="' + $code + '"] .swatch-attribute-options .swatch-option').each(function () {
                                  var optionLable = $(this).attr(swSelector + 'option-label').replace(/[~`!@#$%^&*()|\;:'",.<>\{\}\[\]\\\/]/g,'').replace(/\s/g,'');
@@ -59,5 +59,14 @@ Bss_Simpledetailconfigurable/js/configurable_control.js:
                                  if (optionLable == $value) {
                                      $(this).trigger('click');
                                      return false;
+@@ -1305,7 +1305,7 @@
+             if (undefined !== productId) {
+                 $('div.data.item.title').each(function (idx, elem) {
+                     var triggerIds = $(elem).attr('data-trigger');
+-                    if (undefined !== triggerIds) {
++                    if (undefined !== triggerIds && triggerIds.match(/^[\d,]+$/)) {
+                         if (triggerIds.split(",").indexOf(productId) !== -1) {
+                             if (!$(elem).is(':visible')) {
+                                 $(elem).removeClass('bss-tab-hidden').show();
 
 ```
