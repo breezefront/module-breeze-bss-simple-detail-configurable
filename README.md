@@ -11,6 +11,8 @@ bin/magento module:enable Swissup_BreezeBssSimpleDetailConfigurable
 
 ## Required patches
 
+Please disable the _Ajax Load Detail_ option since it's not supported.
+
 Bss_Simpledetailconfigurable/js/configurable_control.js:
 
 ```diff
